@@ -131,3 +131,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/login/"
+# ============================
+# DJANGO SECURITY LOGGING
+# ============================
+import logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    # Format of log messages
+    "formatters": {
+        "siem": {
+            "format": "%(asctime)s %(levelname)s %(message)s",
+        },
+    },
+
+    # Where logs are written
+    "handlers": {
+        "auth_file": {
+            "class": "logging.FileHandler",
+            "filename": "/var/log/django_auth.log",
+            "formatter": "siem",
+        },
+    },
+
+    # Root logger (VERY IMPORTANT)
+    "root": {
+        "handlers": ["auth_file"],
+        "level": "INFO",
+    },
+}
