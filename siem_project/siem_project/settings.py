@@ -131,33 +131,40 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/login/"
-# ============================
-# DJANGO SECURITY LOGGING
-# ============================
-import logging
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
-    # Format of log messages
-    "formatters": {
-        "siem": {
-            "format": "%(asctime)s %(levelname)s %(message)s",
-        },
-    },
-
-    # Where logs are written
     "handlers": {
         "auth_file": {
             "class": "logging.FileHandler",
             "filename": "/var/log/django_auth.log",
-            "formatter": "siem",
         },
     },
-
-    # Root logger (VERY IMPORTANT)
-    "root": {
-        "handlers": ["auth_file"],
-        "level": "INFO",
+    "loggers": {
+        "django.security": {
+            "handlers": ["auth_file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "django.contrib.auth": {
+            "handlers": ["auth_file"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }
+
+# Email settings for alerts
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Use 'smtp' for production
+EMAIL_HOST = 'smtp.gmail.com'  # Example; configure for your provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'your-email@example.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your-password')
+DEFAULT_FROM_EMAIL = 'alerts@siem-django.com'
+
+# Elasticsearch settings
+ELASTICSEARCH_HOSTS = ['http://localhost:9201']
+ELASTICSEARCH_API_KEY = os.getenv("ELASTICSEARCH_API_KEY", "")
+ELASTICSEARCH_INDEX = 'django-audit-logs'
