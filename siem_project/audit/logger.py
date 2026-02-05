@@ -1,7 +1,7 @@
 import logging
 from elasticsearch import Elasticsearch, ApiError
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Initialize ES client
 es_client = Elasticsearch(
@@ -18,7 +18,7 @@ class ElasticsearchHandler(logging.Handler):
                 'username': getattr(record, 'username', 'unknown'),
                 'ip_address': getattr(record, 'ip_address', 'unknown'),
                 'severity': record.levelname,
-                'timestamp': datetime.fromtimestamp(record.created).isoformat(),  # Convert float to ISO string
+                'timestamp': datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
                 'message': record.getMessage()
             }
             es_client.index(index=settings.ELASTICSEARCH_INDEX, document=log_entry)
