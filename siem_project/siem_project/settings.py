@@ -165,6 +165,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your-password')
 DEFAULT_FROM_EMAIL = 'alerts@siem-django.com'
 
 # Elasticsearch settings
-ELASTICSEARCH_HOSTS = ['http://localhost:9201']
-ELASTICSEARCH_API_KEY = os.getenv("ELASTICSEARCH_API_KEY", "")
+ELASTICSEARCH_HOSTS = ['http://localhost:9200']
+ELASTICSEARCH_API_KEY = None
 ELASTICSEARCH_INDEX = 'django-audit-logs'
