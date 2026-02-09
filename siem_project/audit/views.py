@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 # HOME (PUBLIC)
 # ----------------------------
 def home(request):
-    return HttpResponse("Hello, this is the Audit Home Page.")
+    return render(request, "audit/home.html")
 
 # ----------------------------
 # LOGIN

@@ -2,26 +2,30 @@
 <html>
 <head>
     <title>Login</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'audit/css/style.css' %}">
 </head>
 <body>
 
-<h2>Login</h2>
+<div class="login-container">
+    <h2>Login</h2>
 
-{% if error %}
-<p style="color:red;">Invalid username or password</p>
-{% endif %}
+    {% if error %}
+    <div class="error-message">Invalid username or password</div>
+    {% endif %}
 
-<form method="post">
-    {% csrf_token %}
+    <form method="post">
+        {% csrf_token %}
 
-    <label>Username:</label><br>
-    <input type="text" name="username"><br><br>
+        <label>Username:</label>
+        <input type="text" name="username">
 
-    <label>Password:</label><br>
-    <input type="password" name="password"><br><br>
+        <label>Password:</label>
+        <input type="password" name="password">
 
-    <button type="submit">Login</button>
-</form>
+        <button type="submit">Login</button>
+    </form>
+</div>
 
 </body>
 </html>

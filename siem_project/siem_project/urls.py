@@ -21,7 +21,8 @@ from django.urls import path
 import audit.views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.home),
+    path('home/', views.home, name='home_explicit'),
+    path('', views.home, name='home'),
     path("login/", views.user_login, name="login"),
     path("dashboard/", views.dashboard, name="dashboard"),
 ]
