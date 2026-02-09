@@ -1,0 +1,57 @@
+# Wazuh Integration Plan
+
+Integrate Wazuh SIEM into the project.
+Since an Elasticsearch instance (Version 8.11) is already running on port 9200, **we will deploy Wazuh on alternate ports** to avoid conflicts.
+This allows the existing setup to remain untouched while we verify the new Wazuh integration.
+
+## User Review Required
+
+> [!NOTE]
+> **Resource Warning**: Running *two* heavy stacks (Elasticsearch + Wazuh Indexer) simultaneously requires significant RAM (4GB+ dedicated to Docker).
+> If your system becomes slow, successful verification, you can stop the old `elasticsearch` and `kibana` services:
+> `docker-compose stop elasticsearch kibana`
+
+## Proposed Changes
+
+### Infrastructure (`docker-compose.yml`)
+
+#### [MODIFY] [docker-compose.yml](file:///home/kali/Django/docker-compose.yml)
+- Add **Wazuh Indexer** service (OpenSearch based).
+    - Port: `9205` (Avoids 9200)
+    - Volume: `wazuh_indexer_data`
+- Add **Wazuh Manager** service.
+    - Ports: `1514` (Agent auth), `55000` (API)
+    - Volume: `wazuh_api_configuration`, `wazuh_etc`, `wazuh_logs`, `wazuh_queue`, `wazuh_var_multigroups`, `wazuh_integrations`, `wazuh_active_response`, `wazuh_agentless`, `wazuh_vodle`
+- Add **Wazuh Dashboard** service.
+    - Port: `5602` (Avoids 5601)
+    - Link to Wazuh Indexer (9205).
+- Define new volumes and ensure networks match.
+
+### Backend (`siem_project`)
+
+#### [MODIFY] [requirements.txt](file:///home/kali/Django/siem_project/requirements.txt)
+- Add `opensearch-py` (For communicating with Wazuh Indexer).
+- Keep `elasticsearch` (Optional, if you still reference the old ES, otherwise we can remove it. Plan: Keep for now to avoid breaking existing code, but add `opensearch-py` for the new logger).
+
+#### [MODIFY] [settings.py](file:///home/kali/Django/siem_project/siem_project/settings.py)
+- Add `WAZUH_INDEXER_HOSTS = ['https://localhost:9205']`
+- Add `WAZUH_INDEXER_AUTH = ('admin', 'SecretPassword1!')`
+- Add `WAZUH_INDEXER_USE_SSL = True`
+
+#### [MODIFY] [audit/logger.py](file:///home/kali/Django/siem_project/audit/logger.py)
+- Create a new `WazuhHandler` using `opensearch-py`.
+- Configure `audit_logger` to use `WazuhHandler` instead of (or in addition to) the old `ElasticsearchHandler`.
+- *Goal*: Send Django audit logs to Wazuh.
+
+## Verification Plan
+
+### Automated
+1.  `docker-compose up -d`
+2.  `curl -k -u admin:SecretPassword1! https://localhost:9205` (Verify Indexer is up).
+3.  `curl -k -u admin:SecretPassword1! https://localhost:55000/security/user/authenticate` (Verify Manager API).
+
+### Manual
+1.  Access **Wazuh Dashboard** at `https://localhost:5602`.
+2.  Login (`admin` / `SecretPassword1!`).
+3.  Trigger Django logs (Login/Logout).
+4.  Verify logs appear in Wazuh Dashboard (using `django-audit-logs` index pattern).
