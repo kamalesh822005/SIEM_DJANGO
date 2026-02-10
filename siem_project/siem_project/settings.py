@@ -61,7 +61,7 @@ ROOT_URLCONF = 'siem_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -165,6 +165,13 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'your-password')
 DEFAULT_FROM_EMAIL = 'alerts@siem-django.com'
 
 # Elasticsearch settings
+# Elasticsearch settings
 ELASTICSEARCH_HOSTS = ['http://localhost:9200']
 ELASTICSEARCH_API_KEY = None
 ELASTICSEARCH_INDEX = 'django-audit-logs'
+
+# Wazuh Indexer settings
+WAZUH_INDEXER_HOSTS = ['https://localhost:9205']
+WAZUH_INDEXER_AUTH = ('admin', 'SecretPassword1!')
+WAZUH_INDEXER_USE_SSL = True
+WAZUH_INDEXER_VERIFY_CERTS = False

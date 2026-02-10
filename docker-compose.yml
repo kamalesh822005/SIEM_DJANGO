@@ -15,9 +15,22 @@ services:
     networks:
       - siem_net
 
+  kibana:
+    image: kibana:8.11.0
+    container_name: kibana
+    volumes:
+      - ./kibana_config.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - siem_net
+
   wazuh.indexer:
     image: wazuh/wazuh-indexer:4.7.5
     container_name: wazuh.indexer
+    hostname: demo.indexer
     ports:
       - "9205:9200"
     environment:
@@ -25,7 +38,9 @@ services:
     volumes:
       - wazuh_indexer_data:/var/lib/wazuh-indexer
     networks:
-      - siem_net
+      siem_net:
+        aliases:
+          - demo.indexer
 
   wazuh.manager:
     image: wazuh/wazuh-manager:4.7.5
@@ -37,7 +52,7 @@ services:
       - "514:514/udp"
       - "55000:55000"
     environment:
-      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_URL=https://demo.indexer:9200
       - INDEXER_USERNAME=admin
       - INDEXER_PASSWORD=SecretPassword1!
     depends_on:
@@ -52,6 +67,8 @@ services:
       - wazuh_active_response:/var/ossec/active-response
       - wazuh_agentless:/var/ossec/agentless
       - wazuh_vodle:/var/ossec/vodle
+      - ./wazuh_config/ossec.conf:/var/ossec/etc/ossec.conf
+      - ./wazuh_config/local_rules.xml:/var/ossec/etc/rules/local_rules.xml
     networks:
       - siem_net
 
@@ -61,7 +78,7 @@ services:
     ports:
       - "5602:5601"
     environment:
-      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_URL=https://demo.indexer:9200
       - WAZUH_API_URL=https://wazuh.manager:55000
     depends_on:
       - wazuh.indexer

@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+<div style="position: absolute; top: 10px; right: 490px; z-index: 999;">
+    <a href="https://localhost:5602" target="_blank"
+        style="display: inline-block; padding: 8px 15px; background: #005fd4; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px; font-size: 13px;">Wazuh</a>
+    <a href="http://localhost:5601" target="_blank"
+        style="display: inline-block; padding: 8px 15px; background: #00bfb3; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">Kibana</a>
+</div>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* Ensure buttons look good on mobile and fit in header nicely */
+    #header {
+        position: relative;
+        /* Ensure absolute positioning works */
+    }
+
+    @media (max-width: 900px) {
+        #branding div {
+            position: static !important;
+            float: none !important;
+            margin-top: 10px !important;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
