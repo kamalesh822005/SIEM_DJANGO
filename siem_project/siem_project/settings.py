@@ -138,7 +138,7 @@ LOGGING = {
     "handlers": {
         "auth_file": {
             "class": "logging.FileHandler",
-            "filename": "/var/log/django_auth.log",
+            "filename": str(BASE_DIR / "django_auth.log"),
         },
     },
     "loggers": {

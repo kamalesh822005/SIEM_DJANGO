@@ -1,7 +1,7 @@
 anyio==4.12.1
-asgiref==3.11.0
+asgiref==3.11.1
 certifi==2026.1.4
-Django==4.2.27
+Django==5.2.13
 elastic-transport==8.17.1
 elasticsearch==8.19.3
 idna==3.11
